@@ -1,0 +1,153 @@
+/*
+	Template Metaprogramming
+	-------------------------------
+	Programming that manipulates program entities
+	such as classes and functions.
+
+	Think of templates as generators, they 
+	are used to make classes and functions.
+
+	An exercise in writing programs that compute
+	at compile time and generate programs.
+
+	Reasons for metaprogramming.
+	1. Improved type safety: we can compute the exact
+	   types needed for a data structure or algorithm
+	   so that we don't need to directly manipulate
+	   low-level data structures.
+	2. Improved run-time performance: we can compute
+	   values at compile-time and select functions to
+	   be called at runtime.
+	   That way, we don't need to do those computations
+	   at run time.
+
+	Templates were designed to very general and able to
+	generate optimal code.
+	
+	When I write a generic algorithm or type, I don't feel
+	that I am writing a compile time program.
+
+	Generic programming is primarily a design philosophy.
+	
+	Metaprogramming is programming. The emphasis is on
+	computation, often involving selection and some form
+	of iteration.
+
+	4 levels of implementation complexity:
+	1. No computation (just pass type and value arguments)
+	2. Simple computatioon.
+	3. Computation using explicit compile-time tests,
+	   for example compile time if.
+	4. Computation using compile-time iteration (in the
+	   form of recursion)
+
+    A metaprogram is a compile-time computation yielding
+	types or functions to be used at run time.
+
+	Generic programming usually falls into the first,
+	"no computation" category, but it is quite possible
+	to support generic programming using metaprogramming
+	techniques.
+
+	Generic programming focuses on interface specification,
+	whereas metaprogramming is programming, usually with
+	types as the values.
+
+*/
+
+/* 
+	Type Functions
+	-----------------------------------------
+	A type function is a function that either takes
+	at least one type argument or produces at least
+	one type as a result.
+
+	For example:
+
+	sizeof(T) - Is a built-in type function that given
+	a type T returns the size of an object (measured in
+	chars).
+	
+	Type functions don't have to look like conventional
+	functions.
+	is_polymorphic<T>: takes its argument as template
+	argument and returns its result as a member called 
+	value.
+
+	if (is_polymorphic<int>::value) cout << "Big surprise!";
+
+	STL convention is that a type function that returns
+	a type does so by a member called type.
+
+*/
+
+enum class Axis : char { x, y, z};
+enum flags { off, x=1, y=x<<1, 
+             z=x<<2, t=x<<3 };
+typename std::underlying_type<Axis>::type x;
+typename std::underlying_type<Axis>::type y;
+
+/*
+	A type function can take more than one 
+	argument and return several result values.
+*/
+
+template<typename T, int N>
+struct Array_type {
+	using type = T;
+	static const int dim = N;
+	// ..
+};
+
+using Array = Array_type<int, 20>;
+Array::type x; // x is an int
+constexpr int s = Array::dim; // s is 3
+
+/*
+	C++ type functions are mostly templates.
+	They can perform very general computations
+	using types and values.
+
+	For example, we might want to allocate
+	an object on the stack provided that it is
+	small and on the free store otherwise: 
+
+*/
+
+constexpr int on_stack_max = sizeof(std::string);
+
+template<typename T>
+struct Obj_holder {
+	using type = 
+		typename std::conditional<(sizeof<T> <= on_stack_max),
+									Scoped<T>,
+									On_Heap<T>>::type;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
